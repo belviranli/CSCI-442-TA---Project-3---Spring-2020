@@ -1,0 +1,9 @@
+num processes
+process_id process_file         // The process ID and corresponding process image file
+process_id process_file         // The process ID and corresponding process image file
+
+process_id virtual_address      // PID of process and the address being accessed
+process_id virtual_address      // PID of process and the address being accessed
+process_id virtual_address      // PID of process and the address being accessed
+process_id virtual_address      // PID of process and the address being accessed
+...                             // Keep reading until EOF

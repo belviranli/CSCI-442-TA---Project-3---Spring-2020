@@ -1,0 +1,428 @@
+\documentclass[10pt]{article}
+
+% Layout Options
+\usepackage[margin = 1.0in]{geometry}
+\geometry{letterpaper}
+
+\usepackage{acjpreamble}
+\usepackage[modulo]{lineno}
+
+
+\lstset{
+tabsize = 4, %% set tab space width
+    showstringspaces = false, %% prevent space marking in strings, string is defined as the text that is generally printed directly to the console
+    numbers = right, %% display line numbers on the left
+    commentstyle = \color{gray}, %% set comment color
+    keywordstyle = \color{blue}, %% set keyword color
+    stringstyle = \color{red}, %% set string color
+    rulecolor = \color{black}, %% set frame color to avoid being affected by text color
+    basicstyle = \small \ttfamily , %% set listing font and size
+    breaklines = true, %% enable line breaking
+    numberstyle = \tiny,
+}
+
+
+% \setlength{\headheight}{15.2pt}
+
+\begin{document}
+\thispagestyle{empty}
+\begin{titlepage}
+    \centering
+    {\Huge Project 3 \par \vspace{0.5cm}}
+    %{\huge Operating Systems \par \vspace{0.5cm}}
+    {\Large A Simple Memory Management Simulator \par}
+    {\normalsize   \par}
+
+    \vfill
+    {\normalsize Operating Systems \par}
+    {\normalsize Department of Computer Science \par}
+    {\normalsize Colorado School of Mines \par}
+    {\normalsize \today \par}
+    \thispagestyle{empty}
+    \thispagestyle{empty}
+\end{titlepage}
+
+\clearpage
+\pagestyle{fancy}
+\lhead[Project 3 --- Memory Management Simulator]{Project 3 --- Memory Management Simulator}
+\rhead[CSCI 442 --- Operating Systems]{CSCI 442 --- Operating Systems}
+
+\newcommand{\assigndate}{April 15, 2020}
+\newcommand{\duedate}{23:59 May 1, 2020}
+\newcommand{\duedatefinal}{23:59 May 6, 2020}
+\newcommand{\gittagdone}{P3-DONE}
+
+%--------------------------------------------------
+%	INTRODUCTION
+%--------------------------------------------------
+
+\section*{Introduction}
+% \begin{center}
+% {\large Assigned Date: November 8, 2019} \\ \vspace{0.25em}
+
+% {\large Deliverable 1 Due: 23:59 (11:59pm) November 22, 2019} \\ \vspace{0.25em}
+
+% {\large Deliverable 2 Due: 23:59 (11:59pm) December 05, 2019}
+% \end{center}
+\linenumbers
+For this project, you will implement a simulation of an operating system’s memory manager. The simulation
+will read files representing the process images of various processes, then replay a set of virtual address
+references to those processes using one of two different replacement strategies. The output will be various
+statistics, including the number of memory accesses, page faults, and free frames remaining in the system.
+
+This project must be implemented in C++, and it must execute correctly on the computers in the Alamode lab.
+
+%--------------------------------------------------
+%	DELIVERABLES
+%--------------------------------------------------
+
+\section{Deliverables}
+\label{sec:deliverables}
+
+We will continue to use GitHub for managing the submissions, and a link to the starter code will be provided on Canvas.
+
+\subsection{Final Deliverable: Due \duedate}
+
+\begin{itemize}
+    \item All unit tests in the starter code pass when running \texttt{make test}.
+    \item The replacement strategy can be specified using the \texttt{--strategy} flag (Section \ref{sec:replacement_strats}, Section \ref{sec:flags}).
+    \item The maximum number of frames a process may use is configurable using the \texttt{--max-frames} flag (Section \ref{sec:sim_props}, Section \ref{sec:flags}).
+    \item All required information is present in the output as specified in Section \ref{sec:output}.
+    \item Details about individual memory accesses are correctly displayed when the \texttt{--verbose} flag is set (Section \ref{sec:output}).
+    \item A file called \texttt{author} is present in \texttt{submission-details/} that contains your name. You will receive a zero on this project if it is not present.
+    \item All unit tests in the starter code pass when running \texttt{make test}.
+\end{itemize}
+
+Examples of the correct output for this deliverable are provided with the starter code.
+
+While the official due date is \duedate, there will be an automatic extension until \duedatefinal. \textcolor{red}{\textbf{However \duedatefinal{} is the \textit{FINAL} deadline to ensure that grading is able to be completed in a timely manner.}}
+
+%--------------------------------------------------
+%	GRADING
+%--------------------------------------------------
+
+\section{Grading}
+
+Grading for this project will be split between passing unit tests and your program's ability to produce the correct output given a simulation input file, so it is vital that you follow all output requirements as mentioned in Section \ref{sec:output}. Given that you have been provided with example outputs and a script to help you verify your program's outputs, little tolerance will be made for programs that do not abide by these output formatting rules and examples.
+
+Make sure all debugging and other non-required print statements have been commented out before submitting your deliverables.
+
+Your project cannot be graded we do not know whose project it is. Make sure the \texttt{author} file is present and contains your name as described in Section \ref{sec:deliverables}.
+
+The following rubric will be used to when grading your project:
+
+\begin{itemize}
+    \item Unit tests: 50\%
+    \item Output matching with provided examples: 30\%
+    \item Output matching with grader test cases: 20\%
+\end{itemize}
+
+%--------------------------------------------------
+%	REQUIREMENTS AND REFERENCE
+%--------------------------------------------------
+
+\section{Requirements and Reference}
+\label{sec:req_refs}
+
+\begin{itemize}
+    \item To compile your code, the grader should be to \texttt{cd} into it and simply type \texttt{make}. Typing \texttt{make test} should run the unit tests, all of which should pass. The grader must be able to do this using the \texttt{Makefile} that is provided with the starter code.
+    \item Do not modify the \texttt{Makefile} provided in the starter code. The grader will be replacing the \texttt{Makefile} with a copy of the one provided with the starter code during grading.
+    \item The grader must be able to execute your program by typing \texttt{./mem-sim} from the root of your repository.
+    \item Do not modify the directory structure provided in the starter code.
+    \item The \texttt{author} file must be present as detailed in Section \ref{sec:deliverables}.
+    \item Your project must execute correctly on the Alamode computers. That is where it will be graded.
+    \item As long as they are present on the Alamode computers, you are encouraged to use any C++ libraries you may find useful, such as \texttt{<bitset>}, \texttt{<map>}, \texttt{<queue>}, etc.
+    \item Use good formatting skills. A well formatted project will not only be easier to work in and debug, but it will also make for a happier grader.
+\end{itemize}
+
+\section{Submission Checklist}
+
+Please make sure that you have done all of the following prior to submission via the \texttt{submit-my-work} program:
+
+\begin{enumerate}
+    \item Your code compiles on the Alamode machines.
+    \begin{itemize}
+        \item Run \texttt{make clean \&\& make}. Your program should compile and "Successfully Compiled!" should print to the screen.
+    \end{itemize}
+    \item Your program should be able be invoked from the root of your repository.
+    \begin{itemize}
+        \item Run \texttt{./mem-sim} from the root of your repository.
+    \end{itemize}
+    \item Your program passes all of its unit tests.
+    \begin{itemize}
+        \item Run \texttt{make test} from the root of your repository.
+    \end{itemize}
+    \item Your implementation of the simulation logic and replacement strategies is finished.
+    \begin{itemize}
+        \item Run \texttt{./test-my-work.sh} from the root of your repository.
+        \item Your solution should be identical to the provided solutions.
+    \end{itemize}
+    \item Make sure the \texttt{submission-details} folder contains:
+    \begin{itemize}
+        \item An \texttt{author} file that contains your full name.
+        \item A \texttt{time-spent} file that contains the time you have spent on this project, in \textit{minutes}. Please keep entering \texttt{echo MINUTES >> submission-details/time-spent} (from the root of your repository) as you progress through the project.
+    \end{itemize}
+    \item All the files required for your project have been committed and pushed to your GitHub repository.
+    \item The submission script, \texttt{submit-my-work} successfully runs:
+    \begin{itemize}
+        \item Run \texttt{./submit-my-work} from the root of your repository. Make sure it has execution permissions with \texttt{chmod +x submit-my-work}
+    \end{itemize}
+\end{enumerate}
+
+%--------------------------------------------------
+%	GETTING STARTED
+%--------------------------------------------------
+
+\section{Getting Started}
+
+In recognition of the challenges that have been caused by the quarantine due to COVID-19, as well as the compressed amount of time to complete the project, you have been provided with starter code that has some basic functionality implemented and a set of unit tests to help you with implementing the project. The starter code implements command line flag parsing and simulation file parsing, in addition to functionality from data structures that were required to implement these features. However you will still need to complete the implementation of many of the included data structures.
+
+The starter code already has a \texttt{Makefile} that builds everything under the \texttt{src/} directory, placing temporary files in a bin directory and the program itself (named \texttt{mem-sim} by default) in the root of the repository.
+It also includes a \texttt{make test} target that will automatically build all \texttt{\_tests.cpp} files placed anywhere under the \texttt{src/} directory.
+
+It has numerous classes declared that attempt to model the various concepts in memory management you’ll
+need. Most are located in subdirectories of the \texttt{src/} directory. Your first task should be to skim through these files to get a handle on what is provided for you.
+
+% You should start by implementing the lowest-level classes, since the implementation of the other classes typically depend on these. Both \texttt{PhysicalAddress} and \texttt{VirtualAddress} are good places to start.
+
+All methods that are declared in a header file have a stub implementation in their corresponding \texttt{.cpp} files.
+Most of these functions have unit tests already written for them, and you will be required to implement the
+function stubs such that all the tests pass. You are free to add additional methods and unit tests how ever
+you see fit.
+
+The starter code has already implemented the flag parsing functionality, and within the \texttt{Simulation} class there exists an implementation of a \texttt{print\_summary} function that should be used once you have populated the \texttt{Simulation} class with the correct variables and functions.
+
+\subsection{Where to Start?}
+
+It is recommended that you start the project by implementing the functionality for the various classes that have been provided for you. You are able to check your work on your implementations using the provided unit testing functionality, discussed in the following section.
+
+Many of these data structures are dependent on each other. For example, think about the relationship between virtual addresses and physical addresses, or pages, page tables, and processes. Thinking about these things, perhaps drawing a diagram to see how they all fit together, will help you better understand how to implement the project. This will also help you better understand how all these pieces need to fit together for your operating system to perform memory management.
+
+While the command line flag parsing functionality has been implemented for you, you should take a look at the \texttt{FlagOptions} struct that stores information retrieved from command line input. This struct is passed into the \texttt{Simulation} class via its constructor, and the values contained in it should be used for various aspects of your simulation. For example, the \texttt{FlagOptions} struct contains variables that let you know if you should be printing the verbose output (Section \ref{sec:output}), what the maximum number of frames for a process should be (Section \ref{sec:sim_props}), or what replacement strategy you should be using (Section \ref{sec:replacement_strats}).
+
+\subsection{Unit Tests}
+
+The starter code contains a number of unit tests to help you implement the various data structures in the project. To run the tests, run the following from within your repository:
+
+\texttt{make test}
+
+Most of them will fail until you implement the corresponding functionality. You can run only certain tests by executing the \texttt{make test} command with a \texttt{TEST\_FILTER} option:
+
+\texttt{make test TEST\_FILER="Test Case Pattern"}
+
+For example, to run only the \texttt{Process} class's test cases, you would type:
+
+\texttt{make test TEST\_FILTER="Process*"}
+
+To run a specific test, say the \texttt{TotalSize} test from the \texttt{Process} test cases, you would type:
+
+\texttt{make test TEST\_FILTER="Process.TotalSize"}
+
+\subsection{Output Testing}
+
+The starter code also has example outputs and a script that you can run to verify your solution with the provided outputs. The example outputs themselves are located under \texttt{tests/}, and the verification script is named \texttt{test-my-work.sh}.
+
+To use the script, from the root of your repository, type these commands into your terminal of choice:
+
+\begin{verbatim}
+chmod +x test-my-work.sh
+./test-my-work.sh
+\end{verbatim}
+
+The \texttt{chmod +x} command only needs to be run once per computer.
+
+The sections below discuss the more technical aspects of the project, so it is suggested that you read them carefully.
+
+%--------------------------------------------------
+%	SIMULATION PROPERTIES
+%--------------------------------------------------
+% \clearpage
+\section{Simulation Properties}
+\label{sec:sim_props}
+
+Your program will simulate memory management for a hypothetical computer system with the following attributes:
+
+\begin{enumerate}
+    \item Pages and frames are both \textbf{64 bytes} in size.
+    \item Main memory consists of \textbf{512 frames} for a total of 32 kilobytes of storage.
+    \item Addresses are \textbf{16 bits long}, with the ten most-significant bits representing the page or frame and the six least-significant representing the offset.
+    \item The maximum number of frames allocated to a process is static. Processes may be allocated frames until either reaching this limit or the system runs out of free frames to allocate.
+    \item The default maximum number of frames is 10, however the user may input a maximum frames value when executing the simulation (Section \ref{sec:flags}).
+    \item All frames in main memory are available for use by user processes; the OS does not occupy any memory (unlike a real computer).
+    \item Page tables do not occupy main memory, and reading from a page table does not constitute a memory access.
+    \item No translation look-aside buffer exists, so you do not need to simulate one.
+    \item Processes exist for the entire duration of the simulation; if you've done the last memory access for a given process as specified in the file, it continues to occupy its current frames for the remainder of the simulation.
+    \item Segfaults (memory access faults) are fatal and should cause the simulation to exit immediately.
+    \begin{itemize}
+        \item There are two kinds of segfaults: invalid page segfaults, and invalid offset segfaults. Invalid page segfaults occur when a process is trying to access a page that it does not have access to. Invalid offset segfaults occur when a process is trying to access an offset that does not exist as valid data in a given frame. Think about the type of segmentation that occurs in virtual memory paging to determine when this might occur.
+    \end{itemize}
+    \item If a process has not reached its maximum number of allocated frames, it should pick the first available frame.
+    \item The replacement strategies in the simulation are \textit{local} replacement strategies. Once a process has reached its maximum number of allocated frames, it needs to pick one of its pages that is in main memory to replace.
+\end{enumerate}
+
+%--------------------------------------------------
+%	REPLACEMENT STRATEGIES
+%--------------------------------------------------
+
+\section{Replacement Strategies}
+\label{sec:replacement_strats}
+
+Your memory management simulation must support two different page-replacement strategies: FIFO and LRU. Which strategy to use should be provided as a command-line flag, as discussed in Section \ref{sec:flags}.
+
+Both of these strategies should be implemented as they are described in your textbook. While LRU is not feasible to implement in real operating systems, your simulation has no such problem. You are free to keep track of whatever dat you need to implement the two required strategies, regardless of how feasible the collection of that data would be in a real OS.
+
+
+
+%--------------------------------------------------
+%	REQUIRED OUTPUT
+%--------------------------------------------------
+\clearpage
+\section{Required Output}
+\label{sec:output}
+
+Examples of all outputs can be found within the starter code under \texttt{tests/}.
+
+\subsection{You Need to Implement}
+
+\subsubsection{\texttt{--verbose}}
+
+If \texttt{--verbose} or \texttt{-v} is specified, your simulation must output information about each memory reference. The required information is as follows:
+
+\begin{itemize}
+    \item The ID of the process making the memory reference.
+    \item The virtual address being accessed.
+    \item Whether the memory access resulted in a page fault or not.
+    \item The physical address corresponding to the virtual address.
+    \item The process' current resident set size (RSS).
+\end{itemize}
+
+Here is an example of what this should look like for one memory reference:
+
+\lstinputlisting[firstline=1, lastline=5]{outputs/sim_1_output_v_flag}
+
+It is recommended that you take advantage of the \texttt{<<} operator overloads written for the virtual and physical address classes when printing this information.
+
+\subsection{Implemented For You}
+
+\textcolor{red}{\textbf{This section is provided for your reference. All the logging and output functionality in this section has been written for you.}}
+
+Unless the \texttt{--csv} or \texttt{-c} flag is input, your program should always output this information to the screen:
+
+\begin{itemize}
+    \item The total number of memory accesses.
+    \item The total number of page faults.
+    \item The number of free frames remaining.
+    \item For each process:
+    \begin{itemize}
+        \item Total number of memory accesses.
+        \item Total number of page faults.
+        \item The percent of memory accesses that caused a page fault.
+        \item The resident set size of the process at the end of the simulation.
+    \end{itemize}
+\end{itemize}
+
+Here is an example of how this should look:
+
+\lstinputlisting{outputs/sim_1_output_no_flag}
+
+\subsubsection{\texttt{--csv}}
+
+If \texttt{--csv} or \texttt{-c} is specified, your simulation must output the same information as mentioned above, but in the format shown below:
+
+\lstinputlisting{outputs/sim_1_output_c_flag}
+
+\textbf{When the \texttt{--csv} flag is provided, your program should not print anything else, even if the \texttt{--verbose} flag is also provided in the command line. \textcolor{red}{(This is taken care of for you within the provided flag parsing functionality.)}} 
+
+% \textbf{Within the \texttt{Simulation} class there is a function written (but commented out) for you called \texttt{print\_statistics}. It is suggested that you take advantage of it as it handles both the no flag case and the \texttt{--csv} flag case for you.}
+
+%--------------------------------------------------
+%	SIMULATION FILE FORMAT
+%--------------------------------------------------
+
+\section{Simulation File Format}
+
+\textcolor{red}{\textbf{This section is provided as a reference. All the file input parsing has been written for you.}}
+
+The simulation file specifies both the set of processes that are currently active in the system and the sequence of virtual addresses that should be accessed. Its format is as follows:
+
+\lstinputlisting{example_sim_input_vars.txt}
+
+Here is an example. Note that the comments won't be in the actual files.
+
+\lstinputlisting{example_sim_input_values.txt}
+
+The first line specifies the number of processes active in the system. You can use this value to control how many subsequent values you interpret as processes.
+
+Each process has both a process ID and a file that contains the data that should be used as its process image. The file should be assumed to be in binary format, though you can read each byte into a \texttt{char} array. The "process file" field is the filename of the process image. It is a filename that points to the location of the process image relative to the location of the \texttt{mem-sim} binary file that you run using \texttt{./mem-sim}.
+
+The starter code contains an example simulation file, as well as a few dummy process images under the \texttt{inputs/} directory.
+
+%--------------------------------------------------
+%	COMMAND LINE FLAGS
+%--------------------------------------------------
+
+\section{Command-Line Flags}
+\label{sec:flags}
+
+\textcolor{red}{\textbf{This section is provided as a reference. All the command line input parsing has been written for you.}}
+
+Your program must support invocation in the format specified below, including the following command-line flags:
+
+\begin{verbatim}
+./mem-sim [flags] simulation_file.txt
+
+-v, --verbose
+    Output information about every memory access.
+
+-s, --strategy <FIFO | LRU>
+    The replacement strategy to use. One of FIFO or LRU.
+
+-f, --max-frames [positive integer]
+    The maximum number of frames a process may be allocated.
+    
+-i, --file-verbose,
+    Print process size and virtual addresses when reading in file.
+    
+-h --help
+    Display a help message about these flags and exit
+\end{verbatim}
+
+\subsection{\texttt{-c, --csv}}
+
+The output required for the \texttt{--csv} flag is described in Section \ref{sec:output}.
+
+\subsection{\texttt{-v, --verbose}}
+
+The output required for the \texttt{--verbose} flag is described in Section \ref{sec:output}.
+
+\subsection{\texttt{-s, --strategy <FIFO | LRU>}}
+
+This flag determines the replacement strategy that your simulation must use when either a process has been allocated the maximum number of frames (determined by \texttt{--max-frames}) or the system has no free frames available. A strategy must be supplied when using this flag. If this flag is not provided, your program should default to using FIFO.
+
+\subsection{\texttt{-f, --max-frames <positive integer>}}
+
+This flag requires a positive integer argument and specifies the maximum number of frames that can be
+allocated to a single process, assuming the system still has free frames available. If a process already
+has this number of frames, or the system has no more free frames to spare, you must replace one of the
+process' other pages using the replacement strategy specified by \texttt{--strategy} to bring in a new page. If the flag is not provided,
+it should default to 10.
+
+\subsection{\texttt{-h, --help}}
+
+The \texttt{--help} flag must cause your program to print out instruction for how to run your program and the flags it accepts and then \textbf{immediately} exit.
+\end{document}
+
+%--------------------------------------------------
+%	References
+%--------------------------------------------------
+
+% If you have references they go here, just comment out both lines
+
+%\bibliography{references}
+%\bibliographystyle{IEEEtran}
+
+% \clearpage
+% \appendix
+% \appendixpage
+
+% \end{document}

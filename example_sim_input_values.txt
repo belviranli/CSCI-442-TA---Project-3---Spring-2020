@@ -1,0 +1,11 @@
+2                       // 2 processes active in the system
+10 process 1.txt        // Process with PID 10 and file containing its process image
+42 process 2.txt        // Process with PID 42 and file containing its process image
+
+10 0010000110011001     // Process 10 accesses address 0010000110011001
+10 0010000110011010     // Process 10 accesses address 0010000110011010
+10 0010000110011011     // Process 10 accesses address 0010000110011011
+42 0110000110011001     // Process 42 accesses address 0110000110011001
+42 0100000110011010     // Process 42 accesses address 0100000110011010
+10 0010000110011001     // Process 10 accesses address 0010000110011001
+...                     // Keep reading until EOF
